@@ -1,0 +1,512 @@
+---
+title: "ritalic guide"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+---
+
+ritalic is a library designed to provide an easy way to get the data of [ITALIC](https://italic.units.it) from R."
+
+<ul>
+<li>The package can be installed from CRAN or from github using the library "devtools"</li>
+</ul>
+```{r, message=FALSE}
+# install from CRAN:
+install.packages("ritalic")
+library(ritalic)
+
+# install from github:
+# install and load devtools
+# install.packages('devtools') # if not already installed
+library(devtools)
+# install and load ritalic
+devtools::install_github("plant-data/ritalic")
+library(ritalic)
+```
+
+For the example load some other utility libraries
+
+```{r, message=FALSE}
+# dplyer for easier data wrangling
+library(dplyr)
+library(plotly)
+library(akima)
+# leaflet for interactive maps
+library(leaflet)
+
+```
+
+# Exploring the functions
+
+ritalic permits to retrieve data about lichens present in Italy and bordering countries
+your list of scientific names, may come from ...
+Alternatively you can start from .. with function 
+The data are obtained from the server of italic, when large amount of sata are requested a progress bar show the status of the data retrieval
+
+## italic_match
+
+- italic_match is the core function of ritalic:
+- takes a vector of scientific names as input, aligns them to checklist of ITALIC and retrieves the corresponding accepted names
+- accepted names can later be passed to the other functions of the package to get data about these taxa
+
+```{r, results='hide'}
+match <- ritalic::italic_match(c('Cetraria islandica L. subsp. islandica', 'Lecanora albela','Parmelia caperata (L.) Ach', 'Ramalina americana Hal' ))
+
+```
+
+```{r}
+match
+accepted_names <- match$accepted_name
+```
+
+now we can store the accepted names into a variable to easily pass them to the next functions
+
+```{r}
+accepted_names <- match$accepted_name
+```
+
+<br/><br/>
+
+## italic_description
+
+return the description and the additional notes of a taxon
+
+```{r, results='hide'}
+descriptions <- ritalic::italic_description(accepted_names)
+```
+
+```{r}
+descriptions
+```
+
+<br/><br/>
+
+## italic_ecology_traits
+
+returns data related to the taxon:
+
+<details>
+<summary>Substrata and morpho-functional traits:</summary>
+<br/>
+<b>substrata</b>
+<ul>
+    <li>saxicolous</li>
+    <li>on lignum</li>
+    <li>epiphytic</li>
+    <li>on soil, terricolous mosses, plant debris</li>
+    <li>foliicolous</li>
+</ul>
+<b>photobiont</b>
+<ul>
+    <li>green algae other than Trentepohlia</li>
+    <li>trentepohlia</li>
+    <li>cyanobacteria, filamentous form, e.g. Nostoc, Scytonema</li>
+    <li>cyanobacteria, coccaceous form, e.g. Gloeocapsa, Xanthocapsa</li>
+</ul>
+<b>growth_form</b>
+<ul>
+    <li>fruticose</li>
+    <li>fruticose filamentous</li>
+    <li>foliose</li>
+    <li>foliose broad-lobed, Parmelia type</li>
+    <li>foliose narrow-lobed, Physcia type</li>
+    <li>foliose umbilicate</li>
+    <li>crustose</li>
+    <li>crustose endolithic</li>
+    <li>crustose placodiomorph</li>
+    <li>leprose</li>
+    <li>squamulose</li>
+    <li>lichenicolous fungus</li>
+    <li>non-lichenized, non-lichenicolous fungus</li>
+</ul>
+<b>phytoclimatic_range</b>
+<ul>
+    <li>oceanic</li>
+    <li>suboceanic</li>
+    <li>subcontinental</li>
+</ul>
+<b>special_requirements_for_water</b>
+<ul>
+    <li>on otherwise dry surfaces with periodical seepage of water after rain</li>
+    <li>periodical submerged, e.g. in creeks or on coastal maritime rocks</li>
+    <li>on surface seldom wetted by rain, e.g. underhangs</li>
+</ul>
+<b>reproductive_strategy</b>
+<ul>
+    <li>mainly sexual</li>
+    <li>mainly asexual, by soredia or soredia-like structures, e.g. blastidia</li>
+    <li>mainly asexual, by isidia or isidia-like structures, e.g. schizidia</li>
+    <li>mainly asexual, by thallus fragmentation</li>
+</ul>
+</details>
+
+<details>
+<summary>Ecological indicators, poleotolerance and altitudinal distribution:</summary>
+<br/>
+<b>ph_of_the_substrata</b>
+<ul>
+    <li>1 - on very acid substrata, such as lignum and conifer bark</li>
+    <li>2 - on acid substrata, such as on non-eutrophicated bark of Quercus</li>
+    <li>3 - on subacid to subneutral substrata (e.g. on bark of Sambucus)</li>
+    <li>4 - on slightly basic substrata, such as dust-covered bark</li>
+    <li>5 - on basic substrata, e.g. pure limestone</li>
+</ul>
+
+<b>solar_irradiation</b>
+
+<ul>
+    <li>1 - in very shaded situations, e.g. deep gorges, closed evergreen forests</li>
+    <li>2 - in shaded situations, such as on the northern side of boles in close-canopied deciduous forests</li>
+    <li>3 - in sites with plenty of diffuse light but scarce direct solar irradiation, such as in rather open-canopied deciduous woodlands</li>
+    <li>4 - in sun-exposed sites, but avoiding extreme solar irradiation</li>
+    <li>5 - in sites with very high direct solar irradiation, such as on the southern side of isolated boles</li>
+</ul>
+
+<b>aridity</b>
+
+<ul>
+    <li>1 - hydro- and hygrophytic, in aquatic or marine situations, or in sites with a very high frequency of fog</li>
+    <li>2 - rather hygrophytic, intermediate between 1 and 2</li>
+    <li>3 - mesophytic</li>
+    <li>4 - xerophytic, but absent from extremely arid stands</li>
+    <li>5 - very xerophytic</li>
+</ul>
+
+<b>eutrophication</b>
+
+<ul>
+    <li>1 - not resistant to eutrophication</li>
+    <li>2 - resistant to a very weak eutrophication</li>
+    <li>3 - resistant to a weak eutrophication</li>
+    <li>4 - occurring in rather eutrophicated situations</li>
+    <li>5 - occurring in highly eutrophicated situations</li>
+</ul>
+
+<b>altitudinal_distribution</b>
+
+<ul>
+    <li>1 - eu-Mediterranean belt (potential vegetation: evergreen Quercus ilex forest)</li>
+    <li>2 - submediterranean belt (deciduous Quercus-Carpinus forests)</li>
+    <li>3 - montane belt (Fagus forests, marking treeline in the Apennines)</li>
+    <li>4 - subalpine and oroboreal belts of the Alps (natural Picea abies, and Larix-Pinus cembra stands)</li>
+    <li>5 - above treeline (both Alpine and oromediterranean)</li>
+    <li>6 - nival belt of the Alps</li>
+</ul>
+<b>poleotolerance</b>
+This value points to the tendency of a lichen to occur in areas with different degrees of human disturbance. It is expressed on 4 classes, as follows:
+<ul>
+    <li>3 - species occurring also in heavily disturbed areas, incl. large towns</li>
+    <li>2 - species occurring also in moderately disturbed areas (agricultural areas, small settlements etc.).</li>
+    <li>1 - species mostly occurring in natural or semi-natural habitats</li>
+    <li>0 - species which exclusively occur on old trees in ancient, undisturbed forests.</li>
+</ul>
+
+</details>
+```{r, results='hide'}
+taxon_data <-  ritalic::italic_ecology_traits(accepted_names)
+```
+```{r}
+taxon_data
+```
+
+<br/><br/>
+
+## italic_taxonomy
+
+returns the taxonomic classification of a taxon
+
+```{r, results='hide'}
+systematics <- ritalic::italic_taxonomy(accepted_names)
+```
+
+```{r}
+systematics
+```
+
+<br/><br/>
+
+## italic_ecoregions_distribution
+
+returns the commonness-rarity for each ecoregion of Italy
+
+<details>
+<summary>How to read and understand the values:</summary>
+![ecoregions in Italy](./images/ecoregions.jpg)
+  <h2> Ecoregions in italy</h1>
+  <ul>
+<li>A: Alpine (above treeline in the Alps and in Abruzzo)</li>
+<li>A1: Subalpine (near treeline in the Alps, oroboreal belt)</li>
+<li>B: Oromediterranean (above treeline outside the Alps except Abruzzo)</li>
+<li>C: Montane (beech forests)</li>
+<li>D: Dry submediterranean (deciduous oaks, excluding SmedH)</li>
+<li>E: Padanian (the plains of the North): this is the only OGU which was not separated on the basis of climatical-biogeographical characters; it is the most heavily anthropised part of Italy, where several species do not occur because of pollution and/or almost total deforestation</li>
+<li>F: Humid submediterranean (as SmedD, but restricted to areas with a warm-humid climate, mostly Tyrrhenian)</li>
+<li>G: Humid Mediterranean (mostly Tyrrhenian)</li>
+<li>H: Dry Mediterranean</li>
+<ul>
+</details>
+```{r, results='hide'}
+rarity <- ritalic::italic_ecoregions_distribution(accepted_names)
+```
+```{r}
+rarity
+```
+
+<br/><br/>
+
+## italic_regions_distribution
+
+returns the presence / absence (1 / 0) of a taxon in each of the 20 administrative regions of Italy
+
+<details>
+<summary>Administrative regions:</summary>
+<img src="./images/regions.png" width="500"/>
+</details>
+```{r, results='hide'}
+distribution <- ritalic::italic_regions_distribution(accepted_names)
+```
+```{r}
+distribution
+```
+
+<br/><br/>
+
+## italic_ecoregions_distribution
+```{r, results='hide'}
+distribution_map <- ritalic::italic_distribution_map(accepted_names[1])
+```
+```{r}
+distribution_map
+```
+
+Creates a distribution map for a given lichen species based on its commonness/rarity status 
+across Italian ecoregions and presence/absence across administrative regions. 
+
+<br/><br/>
+## italic_occurrences
+
+returns all the georeferenced occurrences of a taxon
+
+```{r, results='hide'}
+occurrences <- ritalic::italic_occurrences(accepted_names[1])
+```
+
+```{r}
+occurrences <- occurrences %>%
+  mutate(decimalLatitude = as.numeric(decimalLatitude)) %>%
+  mutate(decimalLongitude = as.numeric(decimalLongitude)) %>%
+  mutate(coordinatesUncertaintyInMeters = as.numeric(coordinatesUncertaintyInMeters))
+nrow(occurrences)
+head(occurrences)
+```
+
+The occurrences can be displayed in a nice map with leaflet:
+
+```{r}
+occurrences %>%
+  leaflet() %>%
+  addTiles() %>%
+  setView(lng = 9.0, lat = 42.0, zoom = 5) %>%
+  #addMarkers(~decimalLongitude, ~decimalLatitude, popup = ~scientificName)
+  addCircleMarkers(~decimalLongitude, ~decimalLatitude,
+    radius = 3,
+    color = "red",
+    stroke = FALSE, fillOpacity = 1
+  )
+```
+
+<br/><br/>
+
+## italic_checklist
+
+```{r}
+checklist <- ritalic::italic_checklist()
+head(checklist)
+```
+
+<br/><br/>
+
+## italic_traits_pa
+
+!!! function in development
+retuns a the traits assigned
+based on the identification keys in ITALIC
+
+```{r, results='hide'}
+traits <- ritalic::italic_traits_pa(accepted_names)
+```
+
+```{r}
+traits
+```
+
+
+# Examples
+
+## 1: compare ecological preferences of different genera
+This document demonstrates how to use the `ritalic` package to retrieve data for the lichen genus *Polyozosia* from the ITALIC database and visualize it using `ggplot2`.
+
+### 1.1: Get Accepted Names for Polyozosia
+First, we'll retrieve the accepted names for all species within the genus *Polyozosia* using `italic_checklist()` and `grep()`.
+
+```{r get_polyozosia_names}
+
+# Get the taxa of the family Verrucariaceae
+acarospora <- italic_checklist(genus="acarospora")
+porina <- italic_checklist(genus="porina")
+
+```
+
+### 1.2 Retrieve Data for Polyozosia
+
+Now, let's retrieve some data for these species. We'll focus on ecology/traits and regional distribution.
+
+```{r get_data}
+# Get ecology and traits
+acarospora_data <- italic_ecology_traits(acarospora)
+porina_data <- italic_ecology_traits(porina)
+```
+### 1.3 plot data
+Note: to plot the data in a 3d graph i used plotly with costom functions
+
+<details>
+<summary>prepare the dataset for visualization</summary>
+```{r utility_plot_func}
+prepare_data <- function(lichen_data, x_col, y_col, option_b, x_range = 1:5, y_range = 1:5) {
+  
+  expanded_grid <- expand.grid(
+    x_val = x_range,
+    y_val = y_range
+  )
+  names(expanded_grid) <- c(x_col, y_col)
+  expanded_grid$z_value <- 0
+  
+  total_species <- nrow(lichen_data)
+  
+  # Construct column names beforehand
+  x_min_col <- paste0(x_col, "_min")
+  x_max_col <- paste0(x_col, "_max")
+  y_min_col <- paste0(y_col, "_min")
+  y_max_col <- paste0(y_col, "_max")
+  
+  for (i in 1:nrow(expanded_grid)) {
+    # Correctly access x_val and y_val using single brackets
+    x_val <- expanded_grid[[x_col]][i]
+    y_val <- expanded_grid[[y_col]][i]
+    
+    # Access columns using single brackets and pre-constructed names
+    count <- sum(
+      lichen_data[, x_min_col] <= x_val & lichen_data[, x_max_col] >= x_val &
+      lichen_data[, y_min_col] <= y_val & lichen_data[, y_max_col] >= y_val
+    )
+    
+    expanded_grid$z_value[i] <- ifelse(option_b, (count / total_species) * 100, count)
+  }
+  
+  return(list(expanded_grid = expanded_grid, total_species = total_species))
+}
+```
+</details>
+
+<details>
+<summary>smooth the data for smoother graph</summary>
+```{r utility_plot_func2}
+library(akima) 
+interpolate_data <- function(expanded_grid, x_col, y_col, length_out = 100, linear = FALSE) {
+
+  
+  interp_result <- interp(
+    x = expanded_grid[[x_col]],
+    y = expanded_grid[[y_col]],
+    z = expanded_grid$z_value,
+    xo = seq(min(expanded_grid[[x_col]]), max(expanded_grid[[x_col]]), length.out = length_out),
+    yo = seq(min(expanded_grid[[y_col]]), max(expanded_grid[[y_col]]), length.out = length_out),
+    linear = linear,
+    extrap = FALSE
+  )
+  
+  interp_df <- data.frame(
+    x = rep(interp_result$x, each = length(interp_result$y)),
+    y = rep(interp_result$y, length(interp_result$x)),
+    z_value = as.vector(interp_result$z)
+  )
+  names(interp_df) <- c(x_col, y_col, "z_value") # Dynamic column names
+  
+  # Set lower bound of z-values to 0
+  interp_df$z_value[interp_df$z_value < 0] <- 0
+  
+  z_matrix_interp <- matrix(interp_df$z_value, nrow = length(interp_result$x), ncol = length(interp_result$y), byrow = FALSE)
+  
+  return(list(interp_df = interp_df, z_matrix = z_matrix_interp, x_values = interp_result$x, y_values = interp_result$y))
+}
+```
+</details>
+<details>
+<summary>create 3d plot</summary>
+```{r utility_plot_func3}
+library(plotly)
+create_3d_plot <- function(x_values, y_values, z_matrix, x_label, y_label, option_b, title = "") {
+  # Determine integer tick values based on data ranges
+  x_ticks <- seq(from = floor(min(x_values)), to = ceiling(max(x_values)), by = 1)
+  y_ticks <- seq(from = floor(min(y_values)), to = ceiling(max(y_values)), by = 1)
+
+  # Calculate camera position for a good fit
+  x_range <- max(x_values) - min(x_values)
+  y_range <- max(y_values) - min(y_values)
+  z_range <- max(z_matrix) - min(z_matrix)
+
+  x_eye <- -1.5 * x_range /2
+  y_eye <- -1.5 * y_range /2
+  z_eye <- 0.9 * z_range 
+
+  p <- plot_ly(x = x_values, y = y_values, z = z_matrix) %>%
+    add_surface(contours = list(
+      z = list(
+        show = TRUE,
+        usecolormap = TRUE,
+        highlightcolor = "#ff0000",
+        project = list(z = TRUE)
+      )
+    )) %>%
+    layout(
+      title = title,
+      scene = list(
+        xaxis = list(
+          title = x_label,
+          tickmode = "array",
+          tickvals = x_ticks,
+          ticktext = as.character(x_ticks)
+        ),
+        yaxis = list(
+          title = y_label,
+          tickmode = "array",
+          tickvals = y_ticks,
+          ticktext = as.character(y_ticks)
+        ),
+        zaxis = list(title = ifelse(option_b, "% of Species", "Number of Species")),
+        camera = list(
+          eye = list(x = x_eye, y = y_eye, z = z_eye),
+          up = list(x = 0, y = 0, z = 1),
+          center = list(x = 0, y = 0, z = 0),
+          projection = list(type = "perspective")
+        ),
+        aspectratio = list(x = 2, y = 2, z = 0.6)
+      )
+    )
+
+  return(p)
+}
+```
+</details>
+
+```{r get_datajd, warning=FALSE}
+porina_prep <- prepare_data(porina_data, "aridity", "solar_irradiation", TRUE, 1:5, 1:5)
+porina_interp <- interpolate_data(porina_prep$expanded_grid, "aridity", "solar_irradiation")
+create_3d_plot(porina_interp$x_values, porina_interp$y_values, porina_interp$z_matrix, "aridity", "solar_irradiation", TRUE, title = "porina")
+acarospora_prep <- prepare_data(acarospora_data, "aridity", "solar_irradiation", TRUE, 1:5, 1:5)
+acarospora_interp <- interpolate_data(acarospora_prep$expanded_grid, "aridity", "solar_irradiation")
+create_3d_plot(acarospora_interp$x_values, acarospora_interp$y_values, acarospora_interp$z_matrix, "aridity", "solar_irradiation", TRUE, title = "acarospora")
+
+
+```
