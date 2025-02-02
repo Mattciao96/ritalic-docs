@@ -13,8 +13,8 @@ ritalic is a library designed to provide an easy way to get the data of [ITALIC]
 </ul>
 ```{r, message=FALSE}
 # install from CRAN:
-install.packages("ritalic")
-library(ritalic)
+#install.packages("ritalic")
+#library(ritalic)
 
 # install from github:
 # install and load devtools
