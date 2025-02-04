@@ -272,7 +272,12 @@ distribution
 
 <br/><br/>
 
-## italic_ecoregions_distribution
+## italic_distribution_map
+
+Creates a distribution map for a given lichen species based on its commonness/rarity status 
+across Italian ecoregions and presence/absence across administrative regions. 
+
+By default the returned result has plot=TRUE, but changed to plot=FALSE to get the sf object
 ```{r, results='hide'}
 distribution_map <- ritalic::italic_distribution_map(accepted_names[1])
 ```
@@ -280,8 +285,6 @@ distribution_map <- ritalic::italic_distribution_map(accepted_names[1])
 distribution_map
 ```
 
-Creates a distribution map for a given lichen species based on its commonness/rarity status 
-across Italian ecoregions and presence/absence across administrative regions. 
 
 <br/><br/>
 ## italic_occurrences
